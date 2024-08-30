@@ -17,10 +17,12 @@ class City {
 class HistoryService {
   // TODO: Define a read method that reads from the searchHistory.json file
   private async read() {
-    return await fs.readFile('db/seachHistory.json',{
+    const searchedCitiesArray = await fs.readFile('db/searchHistory.json',{
       flag: 'a+',
       encoding:'utf8',
     });
+    // console.log(searchedCitiesArray);
+    return searchedCitiesArray;
   }
   // TODO: Define a write method that writes the updated cities array to the searchHistory.json file
   private async write(cities: City[]) {
@@ -46,6 +48,7 @@ async addCity(city: string) {
   if (!city) {
     throw new Error ('Please enter a city name');
   }
+  // console.log(city);
   
   const newCity: City = {
     name: city,
@@ -53,6 +56,9 @@ async addCity(city: string) {
   }
   return await this.getCities()
     .then((cities) => {
+      if (cities.find((index) => index.name === city)){
+      return cities
+      }
       return [...cities, newCity];
     })
     .then((updatedCities) =>this.write(updatedCities))
@@ -64,18 +70,21 @@ async removeCity(id: string) {
     throw new Error ('Something went wrong');
   }
   try {
-    const cities: string = await fs.readFile('db/seachHistory.json', 'utf8');
+    const cities: string = await fs.readFile('db/searchHistory.json', 'utf8');
+    
+    // console.log(id);
+    
     const parsedCities: City[] = JSON.parse(cities);
-
+    // console.log(parsedCities);
     const filteredCities = parsedCities.filter(
       (city: City) => city.id !== id
     );
     if (parsedCities.length === filteredCities.length) {
       return console.error('No match found')
     }
-
+    // console.log(filteredCities);
     await fs.writeFile(
-      'db/seachHistory.json',
+      'db/searchHistory.json',
       JSON.stringify(filteredCities, null, 2)
     )
   }catch (error) {

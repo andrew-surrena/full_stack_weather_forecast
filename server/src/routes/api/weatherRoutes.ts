@@ -2,12 +2,13 @@ import { Router,Request,Response } from 'express';
 const router = Router();
 
 import HistoryService from '../../service/historyService.js';
+import historyService from '../../service/historyService.js';
 import WeatherService from '../../service/weatherService.js';
 
 // TODO: POST Request with city name to retrieve weather data
 router.post('/', async (req:Request, res:Response) => {
   // TODO: GET weather data from city name
-  const cityName = req.body;
+  const cityName = req.body.cityName;
   if(req.body) {
   const cityWeatherData = await WeatherService.getWeatherForCity(cityName);
   await HistoryService.addCity(cityName);
@@ -32,7 +33,7 @@ try{
 if (!req.params.id) {
   res.status(400).json({msg: 'City id not found'});
 }
-await HistoryService.removeCity(req.params.id);
+await historyService.removeCity(req.params.id);
 res.json({ success: 'City successfully reomoved'})
 }catch (err){
 console.log(err);
